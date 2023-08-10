@@ -3,61 +3,6 @@
 from rest_framework import serializers
 from .models import Organization, UserAddress, ProductCategory, Product, Cart, CartItem, Order, OrderItem, DeliveryStatus, User, OrganizationUser
 
-class OrganizationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Organization
-        fields = '__all__'
-
-
-class ProductCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductCategory
-        fields = '__all__'
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
-
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = '__all__'
-
-class CartItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CartItem
-        fields = '__all__'
-
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = '__all__'
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = '__all__'
-
-class DeliveryStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DeliveryStatus
-        fields = '__all__'
-
-
-class OrganizationUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrganizationUser
-        fields = '__all__'
-
-
-class FeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feedback
-        fields = '__all__'
-
-
-
 
 
 

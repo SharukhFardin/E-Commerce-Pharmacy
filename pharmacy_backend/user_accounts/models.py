@@ -38,28 +38,25 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     slug = AutoSlugField(unique=True, populate_from='name')
+
     # organization_user = models.ForeignKey('OrganizationUser', on_delete=models.CASCADE)
     # cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True)
     # address = models.ForeignKey(UserAddress, on_delete=models.SET_NULL, null=True)
+    
     user_type = models.CharField(max_length=255)
 
-    is_default = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
 
     ROLE_CHOICES = (
-        ('owner', 'Owner'),
-        ('admin', 'Admin'),
-        ('manager', 'Manager'),
-        ('staff', 'Staff'),
+        ('marchent', 'Marchent'),
         ('customer', 'Customer')
     )
 
     user_type = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
 

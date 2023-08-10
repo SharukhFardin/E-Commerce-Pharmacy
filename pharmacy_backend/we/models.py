@@ -30,9 +30,21 @@ class Organization(AbstractBaseModel):
 # Model to hold relavant data to every organization User. It is a inbetween model between organization & User
 class OrganizationUser(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    user_type = models.CharField(max_length=255)
+    
+    #is_active = models.BooleanField(default=True)
+    #is_staff = models.BooleanField(default=False)
+    #user_type = models.CharField(max_length=255)
+    #role = models.CharField(max_length=255)
+    
+    ROLE_CHOICES = (
+        ('owner', 'Owner'),
+        ('admin', 'Admin'),
+        ('manager', 'Manager'),
+        ('staff', 'Staff'),
+    )
+
+    role  = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
+
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_default = models.BooleanField(default=False)
