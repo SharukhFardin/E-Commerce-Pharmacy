@@ -25,6 +25,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
+        user.is_active = True
         user.save(using=self._db)
 
         return user
@@ -57,10 +58,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_type = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
+   
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+    # REQUIRED_FIELDS=['first_name', 'last_name', 'username']
 
 
 # Address table to hold addresses of an User. An user can have multiple address
