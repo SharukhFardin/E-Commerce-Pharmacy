@@ -40,16 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20)
     slug = AutoSlugField(unique=True, populate_from='name')
-
-    # organization_user = models.ForeignKey('OrganizationUser', on_delete=models.CASCADE)
-    # cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True)
-    # address = models.ForeignKey(UserAddress, on_delete=models.SET_NULL, null=True)
-    
     user_type = models.CharField(max_length=255)
-
-    is_staff = models.BooleanField(default=False)
-
-
+    
     ROLE_CHOICES = (
         ('marchent', 'Marchent'),
         ('customer', 'Customer')
@@ -58,14 +50,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_type = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_staff = models.BooleanField(default=False)
     
-   
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-
-
-    # REQUIRED_FIELDS=['first_name', 'last_name', 'username']
 
 
 # Address table to hold addresses of an User. An user can have multiple address
