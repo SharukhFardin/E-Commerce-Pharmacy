@@ -26,3 +26,9 @@ class MerchantLoginSerializer(serializers.Serializer):
 class CustomerLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
+
+
+# Testing User login
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)

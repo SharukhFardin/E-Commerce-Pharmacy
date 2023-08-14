@@ -31,10 +31,8 @@ class Organization(AbstractBaseModel):
 class OrganizationUser(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     
-    #is_active = models.BooleanField(default=True)
-    #is_staff = models.BooleanField(default=False)
-    #user_type = models.CharField(max_length=255)
-    #role = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     
     ROLE_CHOICES = (
         ('owner', 'Owner'),
