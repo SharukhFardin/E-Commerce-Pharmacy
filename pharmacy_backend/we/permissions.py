@@ -39,3 +39,5 @@ class IsOwner(BasePermission):
 class IsManager(BasePermission):
     def has_permission(self, request, view):
         return request.user.user_type == 'manager'
+    
+

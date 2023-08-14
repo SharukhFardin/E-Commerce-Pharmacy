@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'user_accounts',
     'we',
     'orders_management',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,8 @@ SIMPLE_JWT = {
 }
 
 REST_FRAMEWORK ={ 
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],

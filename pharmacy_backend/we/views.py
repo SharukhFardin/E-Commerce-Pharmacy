@@ -32,11 +32,13 @@ class OrganizationUserViewSet(viewsets.ModelViewSet):
 class ProductCategoryViewSet(viewsets.ModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
+    authentication_classes = [IsAuthenticated]
 
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    #authentication_classes = []
 
 
 class RatingViewSet(viewsets.ModelViewSet):

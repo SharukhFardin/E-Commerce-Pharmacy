@@ -51,6 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     
     objects = UserManager()
 
