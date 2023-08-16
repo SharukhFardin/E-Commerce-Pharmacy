@@ -18,5 +18,6 @@ router.register(r'inventory', OrganizationInventoryViewSet, basename='organizati
 urlpatterns = [
     # ... your other urlpatterns here ...
     path('api/', include(router.urls)),
-    path('api/products/<str:uid>/', ProductViewSet.as_view({'get': 'retrieve'}), name='customer-product-access'),
 ]
+
+# path('api/products/<str:uid>/', ProductViewSet.as_view({'get': 'retrieve'}), name='customer-product-access'),

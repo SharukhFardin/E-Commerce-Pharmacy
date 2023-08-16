@@ -65,7 +65,9 @@ class Product(AbstractBaseModel):
 
 
 # Model for storing user ratings on products
-class Rating(AbstractBaseModel):
+class Rating(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField(
