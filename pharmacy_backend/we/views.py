@@ -109,8 +109,11 @@ class OrganizationInventoryViewSet(viewsets.ReadOnlyModelViewSet):
         organization = organization_user.organization  # Replace 'organization' with your actual field
 
         # Filter the products based on the organization
-        product_category = ProductCategory.objects.filter(organization = organization).first()
-        queryset = Product.objects.filter(category=product_category)
+        #product_category = ProductCategory.objects.filter(organization = organization).first()
+        #queryset = Product.objects.filter(category=product_category)
+
+        queryset = Product.objects.filter(category__organization=organization)
+
 
         return queryset
 
