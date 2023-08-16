@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import PermissionDenied
 
 from user_accounts.serializers import (
-    AddressSerializer, UserSerializer, MerchantLoginSerializer, CustomerLoginSerializer, UserLoginSerializer
+    AddressSerializer, UserSerializer, UserLoginSerializer
 )
 
 from we.models import Product, OrganizationUser
@@ -109,54 +109,6 @@ class CustomerView(APIView):
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
-    
-
-
-
-################# Maybe Individual user login is not necessary right now. #####################
-
-# View for the marchent login
-class MerchantLoginAPIView(APIView):
-    def post(self, request):
-        serializer = MerchantLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = authenticate(request, email=serializer.validated_data['email'], password=serializer.validated_data['password'])
-            if user and user.user_type == 'merchant':
-                login(request, user)
-                return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
-
-# View for the customer login   
-class CustomerLoginAPIView(APIView):
-    def post(self, request):
-        serializer = CustomerLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = authenticate(request, email=serializer.validated_data['email'], password=serializer.validated_data['password'])
-            if user and user.user_type == 'customer':
-                login(request, user)
-                return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
-
-'''
-# Testing user login API
-class UserLoginView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = UserLoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        email = serializer.validated_data['email']
-        password = serializer.validated_data['password']
-        
-        user = authenticate(email=email, password=password)
-
-        if user is not None:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
-        else:
-            return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-'''
         
 
 # Testing user login API

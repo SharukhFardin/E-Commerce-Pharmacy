@@ -17,6 +17,7 @@ class RoleBasedPermission(BasePermission):
         return False
     
 
+# There are problems in this class
 class IsOwner(BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
@@ -39,5 +40,9 @@ class IsOwner(BasePermission):
 class IsManager(BasePermission):
     def has_permission(self, request, view):
         return request.user.user_type == 'manager'
+    
+
+class IsOrganizationMember(BasePermission):
+    pass
     
 
