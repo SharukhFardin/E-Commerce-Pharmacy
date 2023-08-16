@@ -47,7 +47,7 @@ class CartItem(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
-    stock = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField(default=1)
 
 
 # This model will store delivary status 

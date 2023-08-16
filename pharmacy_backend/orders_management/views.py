@@ -43,13 +43,24 @@ class CartItemViewSet(viewsets.ModelViewSet):
         
         cart_items = CartItem.objects.filter(cart = cart)
 
+        # Calculate total price of all cart items
+        total_price = sum(item.product.price * item.amount for item in cart_items)
+        
+        # Add total_price to each cart item object
+        for item in cart_items:
+            item.total_price = item.product.price * item.amount
+
+
         return cart_items
+    
 
         #return CartItem.objects.all()
 
     def create(self, request, *args, **kwargs):
         product_id = request.data.get('product_id')
-        stock = int(request.data.get('stock', 1))  # Default to 1 if not provided
+        amount = int(request.data.get('amount', 1))  # Default to 1 if not provided
+        if amount < 1:
+            amount = 1  # Ensure a minimum value of 1
 
         try:
             product = Product.objects.get(pk=product_id)
@@ -64,37 +75,11 @@ class CartItemViewSet(viewsets.ModelViewSet):
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
 
         if not created:
-            cart_item.stock += stock
+            cart_item.amount += amount
             cart_item.save()
 
         serializer = CartItemSerializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    '''
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product_id')
-        #stock = int(request.data.get('stock', 1))  # Default to 1 if not provided
-
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            cart = Cart.objects.get(user=request.user)
-        except Cart.DoesNotExist:
-            cart = Cart.objects.create(user=request.user)
-
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        
-        if not created:
-            cart_item.stock += stock
-            cart_item.save()
-
-        serializer = self.get_serializer(cart_item)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        '''
     
     def destroy(self, request, *args, **kwargs):
         try:
