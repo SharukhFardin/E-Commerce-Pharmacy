@@ -7,9 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 from we.permissions import *
 from we.models import *
 from user_accounts.permissions import *
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.shortcuts import get_object_or_404 
 
 from .serializers import (
     OrganizationSerializer, ProductCategorySerializer,
@@ -46,11 +47,37 @@ class ProductViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # Testing a thing. It worked woah!!
+    @action(detail=False, methods=['GET'], url_path='slug/(?P<slug>[-\w]+)/', url_name='retrieve-by-slug')
+    def retrieve_by_slug(self, request, slug=None):
+        user_type = self.request.user.user_type
+        if user_type == 'customer':
+            product = get_object_or_404(Product, slug=slug)
+            serializer = self.get_serializer(product)
+            
+            return Response(serializer.data)
+        else:
+            raise PermissionDenied("No product found")
+
+    @action(detail=False, methods=['GET'], url_path='(?P<pk>\d+)/', url_name='retrieve-by-id')
+    def retrieve_by_id(self, request, pk=None):
+        user_type = self.request.user.user_type
+        if user_type == 'merchent':
+            product = get_object_or_404(Product, pk=pk)
+            serializer = self.get_serializer(product)
+            
+            return Response(serializer.data)
+        else:
+            raise PermissionDenied("Use product number after / to view product")
+
+
+    '''
     def get_queryset(self):
         if self.request.user:
             return Product.objects.all()
         else:
             raise PermissionDenied("User is not logged in")
+    '''
         
     def perform_create(self, serializer):
         # Check if the user is a owner or manager before allowing the creation
@@ -106,11 +133,7 @@ class OrganizationInventoryViewSet(viewsets.ReadOnlyModelViewSet):
         authenticated_user = self.request.user
         organization_user = OrganizationUser.objects.filter(user=authenticated_user).first()
 
-        organization = organization_user.organization  # Replace 'organization' with your actual field
-
-        # Filter the products based on the organization
-        #product_category = ProductCategory.objects.filter(organization = organization).first()
-        #queryset = Product.objects.filter(category=product_category)
+        organization = organization_user.organization
 
         queryset = Product.objects.filter(category__organization=organization)
 

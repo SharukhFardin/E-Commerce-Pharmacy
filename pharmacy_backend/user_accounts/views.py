@@ -55,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
         authenticated_user = self.request.user
         organization_user = OrganizationUser.objects.filter(user=authenticated_user).first()
 
-        if organization_user and (organization_user.role == 'owner' or organization_user.role == 'manager'):
+        if organization_user and (organization_user.role == 'owner' or organization_user.role == 'manager' or organization_user.role == 'staff'):
             serializer.save()
         else:
             raise PermissionDenied("Only authenticated organization members can update data.")
@@ -65,7 +65,7 @@ class UserViewSet(viewsets.ModelViewSet):
         authenticated_user = self.request.user
         organization_user = OrganizationUser.objects.filter(user=authenticated_user).first()
 
-        if organization_user and (organization_user.role == 'owner' or organization_user.role == 'manager'):
+        if organization_user and (organization_user.role == 'owner' or organization_user.role == 'manager' or organization_user.role == 'staff'):
             serializer.save()
         else:
             raise PermissionDenied("Only authenticated organization members can update data.")
@@ -111,7 +111,7 @@ class CustomerView(APIView):
         return Response(serializer.data)
         
 
-# Testing user login API
+# User login API
 class UserLoginView(APIView):
     authentication_classes = []
     permission_classes = []

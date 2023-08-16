@@ -101,7 +101,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsMerchant]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user

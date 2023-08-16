@@ -24,15 +24,17 @@ class IsOwner(BasePermission):
             return False
 
         # Retrieve the authenticated owner's role
+        user = request.user
+        organizationuser = OrganizationUser.objects.filter(user=user)
+        
         try:
-            owner_role = request.user.organizationuser.role
+            owner_role = organizationuser.role
         except OrganizationUser.DoesNotExist:
             return False
 
         # Customize permissions based on role
         if owner_role == 'owner':
             return True
-        # Add more role-specific logic here if needed
 
         return False
 
