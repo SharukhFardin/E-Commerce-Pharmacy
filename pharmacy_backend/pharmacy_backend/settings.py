@@ -29,9 +29,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'autoslug',
-    'user_accounts',
+    'accounts',
     'we',
-    'orders_management',
+    'orders',
     'drf_spectacular',
 ]
 
@@ -118,7 +118,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'user_accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Simple JWT settings
@@ -140,3 +140,4 @@ REST_FRAMEWORK ={
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+

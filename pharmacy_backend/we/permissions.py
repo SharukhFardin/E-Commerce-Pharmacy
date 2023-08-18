@@ -3,6 +3,7 @@ from we.models import OrganizationUser
 
 # IsOwner, IsAdmins, IsManager, IsStaff, IsCustomer type of permissions
 
+'''
 class RoleBasedPermission(BasePermission):
     def has_permission(self, request, view):
         user = request.user
@@ -15,7 +16,8 @@ class RoleBasedPermission(BasePermission):
             return True
 
         return False
-    
+'''
+            
 
 # There are problems in this class
 class IsOwner(BasePermission):
@@ -25,9 +27,10 @@ class IsOwner(BasePermission):
 
         # Retrieve the authenticated owner's role
         user = request.user
-        organizationuser = OrganizationUser.objects.filter(user=user)
+        
         
         try:
+            organizationuser = OrganizationUser.objects.get(user=user)
             owner_role = organizationuser.role
         except OrganizationUser.DoesNotExist:
             return False

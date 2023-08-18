@@ -2,7 +2,6 @@
 
 import autoslug.fields
 from django.conf import settings
-import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
 import uuid
@@ -14,26 +13,21 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('we', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Organization',
+            name='Cart',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('slug', autoslug.fields.AutoSlugField(editable=False, populate_from='name', unique=True)),
-                ('name', models.CharField(max_length=100)),
-                ('CEO_name', models.CharField(max_length=100)),
             ],
-            options={
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
-            name='Product',
+            name='Order',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
@@ -41,57 +35,69 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('slug', autoslug.fields.AutoSlugField(editable=False, populate_from='name', unique=True)),
                 ('name', models.CharField(max_length=255)),
-                ('price', models.PositiveIntegerField()),
-                ('description', models.TextField()),
-                ('stock', models.PositiveIntegerField()),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Rating',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('rating', models.PositiveIntegerField(default=5, help_text='Give rating in the range of 1 to 5', validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(5)])),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='we.product')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='ProductCategory',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('slug', autoslug.fields.AutoSlugField(editable=False, populate_from='name', unique=True)),
-                ('name', models.CharField(max_length=255)),
-                ('is_custom', models.BooleanField(default=False)),
+                ('delivery_address', models.CharField(max_length=255)),
                 ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='we.organization')),
             ],
             options={
                 'abstract': False,
             },
+        ),
+        migrations.CreateModel(
+            name='OrderItem',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
+                ('quantity', models.PositiveIntegerField()),
+                ('Product', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='we.product')),
+                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='orders.order')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Feedback',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('slug', autoslug.fields.AutoSlugField(editable=False, populate_from='name', unique=True)),
+                ('feedback', models.TextField()),
+                ('Order', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='orders.order')),
+                ('product', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='we.product')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='DeliveryStatus',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
+                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('IN_TRANSIT', 'In Transit'), ('DELIVERED', 'Delivered'), ('FAILED', 'Failed'), ('COMPLETED', 'Completed')], max_length=20)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='orders.order')),
+                ('updated_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='CartItem',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
+                ('amount', models.PositiveIntegerField(default=1)),
+                ('cart', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='orders.cart')),
+                ('product', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='we.product')),
+            ],
         ),
         migrations.AddField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='we.productcategory'),
+            model_name='cart',
+            name='order',
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='orders.order'),
         ),
-        migrations.CreateModel(
-            name='OrganizationUser',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uid', models.UUIDField(default=uuid.uuid4, editable=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('is_staff', models.BooleanField(default=False)),
-                ('role', models.CharField(choices=[('owner', 'Owner'), ('admin', 'Admin'), ('manager', 'Manager'), ('staff', 'Staff')], default='customer', max_length=10)),
-                ('is_default', models.BooleanField(default=False)),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='we.organization')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
+        migrations.AddField(
+            model_name='cart',
+            name='user',
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]

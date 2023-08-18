@@ -1,11 +1,10 @@
 from django.db import models
 import uuid
-from user_accounts.models import User
+from accounts.models import User
 from autoslug import AutoSlugField
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Here we define the models related to organization and inventory
-
 
 # Base Abstract model from where all other models in this module will be inherited.
 class AbstractBaseModel(models.Model):
@@ -68,7 +67,8 @@ class Product(AbstractBaseModel):
 class Rating(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    #user = models.OneToOneField(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField(
         validators = [MinValueValidator(0), MaxValueValidator(5)],
