@@ -7,11 +7,21 @@ from .models import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('uid', 'name', 'email', 'password', 'phone_number', 'slug', 'user_type', 'created_at', 'updated_at', 'is_staff', 'is_active')
     
     def validate_password(self, value: str) -> str:
         return make_password(value)
 
+
+# Serializer for user models but user registration specific reason.
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('name', 'email', 'password', 'phone_number', 'created_at')
+    
+    def validate_password(self, value: str) -> str:
+        return make_password(value)
+    
 
 # Serializer for User Address
 class AddressSerializer(serializers.ModelSerializer):
