@@ -17,13 +17,13 @@ class OrganizationUserSerializer(serializers.ModelSerializer):
 class ProductCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCategory
-        fields = '__all__'
+        fields = ['name', 'uid', 'created_at', 'updated_at', 'slug', 'is_custom', 'organization']
 
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['uid', 'name', 'price', 'description', 'stock', 'slug']
 
 
 class RatingSerializer(serializers.ModelSerializer):

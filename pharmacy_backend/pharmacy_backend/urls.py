@@ -7,7 +7,7 @@ from accounts.views import UserLoginView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
-    path('login', UserLoginView.as_view(), name='user-login'),
+    path('user/login', UserLoginView.as_view(), name='user-login'),
     path('', include('we.urls')),
     path('', include('orders.urls')),
     

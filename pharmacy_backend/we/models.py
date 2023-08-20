@@ -59,7 +59,7 @@ class Product(AbstractBaseModel):
     name = models.CharField(max_length=255)
     price = models.PositiveIntegerField()
     description = models.TextField()
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, default=2)
     stock = models.PositiveIntegerField()
 
 

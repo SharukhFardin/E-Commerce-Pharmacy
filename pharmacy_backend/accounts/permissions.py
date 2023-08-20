@@ -12,5 +12,9 @@ class IsMerchant(BasePermission):
 
 class IsCustomer(BasePermission):
     def has_permission(self, request, view):
-        return request.user.user_type == 'customer'
+        if request.user.user_type == 'customer':
+            return True
+        else:
+            raise PermissionDenied("Only authenticated organization members can view data.")
+    
     
