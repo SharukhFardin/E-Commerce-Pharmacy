@@ -40,4 +40,4 @@ class CartItemSerializer(serializers.ModelSerializer):
 class DeliveryStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryStatus
-        fields = '__all__'
+        fields = ('uid', 'order', 'status', 'updated_at')

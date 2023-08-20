@@ -68,7 +68,6 @@ class Rating(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    #user = models.OneToOneField(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField(
         validators = [MinValueValidator(0), MaxValueValidator(5)],
