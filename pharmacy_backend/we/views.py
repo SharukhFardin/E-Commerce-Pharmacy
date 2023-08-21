@@ -194,33 +194,41 @@ class RatingAPIView(APIView):
     serializer_class = RatingSerializer
     permission_classes = [IsCustomer]
 
-    def get(self, request, *args, **kwargs):
-        user = self.request.user
-        ratings = Rating.objects.filter(user=user)
-        serializer = RatingSerializer(ratings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        product = request.data.get('product')
-
-        existing_rating = Rating.objects.filter(user=user, product=product).first()
+    def post(self, request, format=None):
+        # Get the user from the request
+        user = request.user
+        
+        # Get the product name from the request data
+        product_name = request.data.get('product_name')
+        
+        # Retrieve the product based on the provided name
+        try:
+            product = Product.objects.get(name=product_name)
+        except Product.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if a rating already exists for the user and product
+        existing_rating = Rating.objects.filter(user=user, product=product).exists()
         if existing_rating:
-            raise ValidationError("You have already rated this product.")
+            return Response({"detail": "You have already rated this product."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create a rating for the product with the user and product details
+        serializer = RatingSerializer(data={'user': user.id, 'product': product.id, **request.data}, context={'request': request})
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Your have successfully rated the product -"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = RatingSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
 
-class RatingList(APIView):
-    serializer_class = RatingSerializer
-    permission_classes = [IsMerchant]
-
-    def get(self, request, *args, **kwargs):
-        user = self.request.user
-        ratings = Rating.objects.filter(user=user)
+class ProductRatingsList(APIView):
+    def get(self, request, product_uid, format=None):
+        try:
+            product = Product.objects.get(uid=product_uid)
+        except Product.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        ratings = Rating.objects.filter(product=product)
         serializer = RatingSerializer(ratings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

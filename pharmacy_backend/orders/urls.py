@@ -11,6 +11,7 @@ urlpatterns = [
     path('me/order', OrderManagementAPIView.as_view(), name='place-order'),
     path('we/order/status', DeliveryStatusMerchantAPIView.as_view(), name='place-order'),
     path('me/order/status', DeliveryStatusCustomerAPIView.as_view(), name='place-order'),
+
     path('me/order/feedback', FeedbackAPIView.as_view(), name='place-order'),
     path('we/order/feedbacks', FeedbackList.as_view(), name='get-order-feedbacks'),
 

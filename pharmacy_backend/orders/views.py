@@ -139,103 +139,87 @@ class DeliveryStatusMerchantAPIView(APIView):
     permission_classes = [IsMerchant]
     serializer_class = DeliveryStatusSerializer
 
-    def get_queryset(self):
-        return DeliveryStatus.objects.all()
-
-    def get_serializer_class(self):
-        return DeliveryStatusSerializer
-
-    def get_object(self, pk):
+    def get_delivery_status(self, order_uid):
         try:
-            return DeliveryStatus.objects.get(pk=pk)
-        except DeliveryStatus.DoesNotExist:
+            order = Order.objects.get(uid=order_uid)
+            delivery_status, created = DeliveryStatus.objects.get_or_create(order=order)
+            return delivery_status
+        except Order.DoesNotExist:
             return None
-
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(queryset, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, *args, **kwargs):
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, pk, *args, **kwargs):
-        instance = self.get_object(pk)
-        if instance is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+    
+    def get(self, request, order_uid, format=None):
+        delivery_status = self.get_delivery_status(order_uid)
+        if delivery_status:
+            serializer = DeliveryStatusSerializer(delivery_status)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request, pk, *args, **kwargs):
-        instance = self.get_object(pk)
-        if instance is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self, request, order_uid, format=None):
+        delivery_status = self.get_delivery_status(order_uid)
+        if delivery_status:
+            serializer = DeliveryStatusSerializer(delivery_status, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+    
     
 
 # APIview for managing delivary-status. ONLY MERCHANTS.
 class DeliveryStatusCustomerAPIView(APIView):
-    permission_classes = [IsMerchant]
+    permission_classes = [IsCustomer]
     serializer_class = DeliveryStatusSerializer
 
-    def get_queryset(self):
-        return DeliveryStatus.objects.all()
-
-    def get_serializer_class(self):
-        return DeliveryStatusSerializer
-
-    def get_object(self, pk):
+    def get_delivery_status(self, order_uid):
         try:
-            return DeliveryStatus.objects.get(pk=pk)
-        except DeliveryStatus.DoesNotExist:
+            order = Order.objects.get(uid=order_uid)
+            delivery_status, created = DeliveryStatus.objects.get_or_create(order=order)
+            return delivery_status
+        except Order.DoesNotExist:
             return None
+    
+    def get(self, request, order_uid, format=None):
+        delivery_status = self.get_delivery_status(order_uid)
+        if delivery_status:
+            serializer = DeliveryStatusSerializer(delivery_status)
+            return Response(serializer.data)
+        return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(queryset, many=True)
-        return Response(serializer.data)
 
 
+# Feedback on Orders APIView. Need to fix it fast.
 class FeedbackAPIView(APIView):
     permission_classes = [IsCustomer]
 
-    def post(self, request, *args, **kwargs):
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data)
+    def post(self, request, format=None):
+        # Get the order UID from the request data
+        order_uid = request.data.get('order_uid')
+        
+        # Retrieve the order based on the provided UID
+        try:
+            order = Order.objects.get(uid=order_uid)
+        except Order.DoesNotExist:
+            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get the logged-in user
+        user = request.user
+        
+        # Create feedback for the order with user and order details
+        serializer = FeedbackSerializer(data={'order': order.id, 'user': user.id, **request.data})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-# Merchant functionality to fetch all the product feedbacks.
+# Merchant functionality to fetch all the product feedbacks. Here exists problems. Need to fix those.
 class FeedbackList(APIView):
-    permission_classes = [IsCustomer]
+    permission_classes = [IsMerchant]
 
-    def post(self, request, *args, **kwargs):
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, format=None):
+        feedback = Feedback.objects.all()
+        serializer = FeedbackSerializer(feedback, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -16,7 +16,7 @@ urlpatterns = [
     path('me/products/<str:slug>', GetproductDetailCustomer.as_view(), name='product-detail-customer'),
 
     # path('we/stock', OrganizationSpecificStockView.as_view(), name='organization-stock'),
-    path('me/products/rating', RatingAPIView.as_view(), name='product-rating'),
-    path('we/products/rating', RatingList.as_view(), name='rating-list'),
+    path('me/product/rating', RatingAPIView.as_view(), name='rate-products'),
+    path('we/products/<uuid:product_uid>/ratings/', ProductRatingsList.as_view(), name='product-ratings'),
 
 ]
