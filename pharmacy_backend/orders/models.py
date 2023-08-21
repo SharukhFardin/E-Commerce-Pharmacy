@@ -10,7 +10,6 @@ import uuid
 class Order(AbstractBaseModel):
     name = models.CharField(max_length=255)
     delivery_address = models.CharField(max_length=255)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
@@ -18,7 +17,7 @@ class Order(AbstractBaseModel):
 class OrderItem(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    Product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    product = models.OneToOneField(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
 
@@ -26,7 +25,7 @@ class OrderItem(models.Model):
 class Cart(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    # order = models.OneToOneField(Order, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,6 +36,9 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+
+    def total_price(self):
+        return self.product.price * self.quantity
 
 
 # Model for storing user feedbacks on products or orders

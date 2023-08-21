@@ -212,6 +212,17 @@ class RatingAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(user=user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
+class RatingList(APIView):
+    serializer_class = RatingSerializer
+    permission_classes = [IsMerchant]
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        ratings = Rating.objects.filter(user=user)
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # View for loading organization specific

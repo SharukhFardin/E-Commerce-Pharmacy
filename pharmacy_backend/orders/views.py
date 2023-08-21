@@ -14,7 +14,7 @@ from django.db import transaction
 from .models import Feedback, Cart, CartItem, Order, OrderItem, DeliveryStatus
 from we.models import Product
 from accounts.permissions import *
-from .serializers import ( CartItemSerializer, OrderItemSerializer, DeliveryStatusSerializer, FeedbackSerializer)
+from .serializers import ( CartItemSerializer, OrderItemSerializer, DeliveryStatusSerializer, OrderSerializer, FeedbackSerializer)
 
     
 # API View for Cart Management
@@ -29,16 +29,20 @@ class CartManagementAPIView(APIView):
         return cart
 
     def get(self, request, format=None):
-        cart = self.get_cart(request.user)
-        cart_items = CartItem.objects.filter(cart=cart)
+        try:
+            cart = self.get_cart(request.user)
+            cart_items = CartItem.objects.filter(cart=cart)
 
-        total_price = sum(item.product.price * item.quantity for item in cart_items)
-        
-        for item in cart_items:
-            item.total_price = item.product.price * item.quantity
+            total_price = sum(item.product.price * item.quantity for item in cart_items)
+            
+            for item in cart_items:
+                item.total_price = item.product.price * item.quantity
 
-        serializer = CartItemSerializer(cart_items, many=True)
-        return Response(serializer.data)
+            serializer = CartItemSerializer(cart_items, many=True)
+            return Response(serializer.data)
+    
+        except Cart.DoesNotExist:
+            return Response({'error': 'Cart does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, format=None):
         product_name = request.data.get('product_name')
@@ -63,9 +67,13 @@ class CartManagementAPIView(APIView):
         serializer = CartItemSerializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self, request, pk, format=None):
+
+class CartDeleteAPIView(APIView):
+    permission_classes = [IsCustomer]
+
+    def delete(self, request, uid, format=None):
         try:
-            instance = CartItem.objects.get(pk=pk)
+            instance = CartItem.objects.get(uid=uid)
         except CartItem.DoesNotExist:
             return Response({"detail": "Cart item not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -90,9 +98,9 @@ class OrderManagementAPIView(APIView):
 
         with transaction.atomic():
             order = Order.objects.create(
-                name=request.user.username,
+                name=request.user.name,
                 delivery_address="Your delivery address here",
-                organization=request.user.organization,
+                # organization=request.user.organization,
                 user=request.user
             )
 
@@ -120,8 +128,14 @@ class OrderManagementAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class OrderList(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsMerchant]
+
+
 # APIview for managing delivary-status. ONLY MERCHANTS.
-class DeliveryStatusAPIView(APIView):
+class DeliveryStatusMerchantAPIView(APIView):
     permission_classes = [IsMerchant]
     serializer_class = DeliveryStatusSerializer
 
@@ -174,9 +188,46 @@ class DeliveryStatusAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+# APIview for managing delivary-status. ONLY MERCHANTS.
+class DeliveryStatusCustomerAPIView(APIView):
+    permission_classes = [IsMerchant]
+    serializer_class = DeliveryStatusSerializer
+
+    def get_queryset(self):
+        return DeliveryStatus.objects.all()
+
+    def get_serializer_class(self):
+        return DeliveryStatusSerializer
+
+    def get_object(self, pk):
+        try:
+            return DeliveryStatus.objects.get(pk=pk)
+        except DeliveryStatus.DoesNotExist:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(queryset, many=True)
+        return Response(serializer.data)
 
 
 class FeedbackAPIView(APIView):
+    permission_classes = [IsCustomer]
+
+    def post(self, request, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+# Merchant functionality to fetch all the product feedbacks.
+class FeedbackList(APIView):
     permission_classes = [IsCustomer]
 
     def post(self, request, *args, **kwargs):
