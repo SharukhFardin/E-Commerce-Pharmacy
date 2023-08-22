@@ -9,10 +9,10 @@ urlpatterns = [
     path('me/cart/<str:uid>', CartDeleteAPIView.as_view(), name='delete-my-cart'),
     path('we/orders', OrderList.as_view(), name='fetch-orders'),
     path('me/order', OrderManagementAPIView.as_view(), name='place-order'),
-    path('we/order/status', DeliveryStatusMerchantAPIView.as_view(), name='place-order'),
-    path('me/order/status', DeliveryStatusCustomerAPIView.as_view(), name='place-order'),
+    path('we/order/<str:uid>/status', DeliveryStatusMerchantAPIView.as_view(), name='view-order'),
+    path('me/order/<str:uid>/status', DeliveryStatusCustomerAPIView.as_view(), name='view-order'),
 
-    path('me/order/feedback', FeedbackAPIView.as_view(), name='place-order'),
-    path('we/order/feedbacks', FeedbackList.as_view(), name='get-order-feedbacks'),
+    path('me/order/<str:uid>/feedback', FeedbackAPIView.as_view(), name='place-order'),
+    path('we/order/<str:uid>/feedbacks', FeedbackDetail.as_view(), name='get-order-feedbacks'),
 
 ]

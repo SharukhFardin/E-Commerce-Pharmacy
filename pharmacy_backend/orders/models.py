@@ -17,7 +17,7 @@ class Order(AbstractBaseModel):
 class OrderItem(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
 
@@ -34,7 +34,7 @@ class Cart(models.Model):
 class CartItem(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
     def total_price(self):
@@ -42,10 +42,12 @@ class CartItem(models.Model):
 
 
 # Model for storing user feedbacks on products or orders
-class Feedback(AbstractBaseModel):
+class Feedback(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False)
     Order = models.OneToOneField(Order, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     feedback = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 # This model will store delivary status 

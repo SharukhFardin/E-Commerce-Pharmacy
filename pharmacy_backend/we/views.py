@@ -89,7 +89,7 @@ class GetOrCreateProductsMerchant(APIView):
 
         if serializer.is_valid():
             product_name = serializer.validated_data.get('name')
-            category_name = serializer.validated_data.get('category_name')
+            # category_name = serializer.validated_data.get('category_name')
             stock = serializer.validated_data.get('stock')
             
             existing_product = Product.objects.filter(name=product_name).first()
@@ -103,8 +103,8 @@ class GetOrCreateProductsMerchant(APIView):
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
             else:
-                category, _ = ProductCategory.objects.get_or_create(name=category_name)
-                serializer.validated_data['category'] = category.id 
+                #category, _ = ProductCategory.objects.get(name=category_name)
+                #serializer.validated_data['category'] = category.id 
                 serializer.validated_data['stock'] = stock  
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)

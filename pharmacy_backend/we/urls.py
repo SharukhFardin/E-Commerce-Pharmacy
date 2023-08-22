@@ -17,6 +17,6 @@ urlpatterns = [
 
     # path('we/stock', OrganizationSpecificStockView.as_view(), name='organization-stock'),
     path('me/product/rating', RatingAPIView.as_view(), name='rate-products'),
-    path('we/products/<uuid:product_uid>/ratings/', ProductRatingsList.as_view(), name='product-ratings'),
+    path('we/products/<uuid:product_uid>/ratings', ProductRatingsList.as_view(), name='product-ratings'),
 
 ]

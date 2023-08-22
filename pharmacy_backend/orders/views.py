@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 
 from django.shortcuts import render
 from django.db import transaction
@@ -139,23 +140,23 @@ class DeliveryStatusMerchantAPIView(APIView):
     permission_classes = [IsMerchant]
     serializer_class = DeliveryStatusSerializer
 
-    def get_delivery_status(self, order_uid):
+    def get_delivery_status(self, uid):
         try:
-            order = Order.objects.get(uid=order_uid)
+            order = Order.objects.get(uid=uid)
             delivery_status, created = DeliveryStatus.objects.get_or_create(order=order)
             return delivery_status
         except Order.DoesNotExist:
             return None
     
-    def get(self, request, order_uid, format=None):
-        delivery_status = self.get_delivery_status(order_uid)
+    def get(self, request, uid, format=None):
+        delivery_status = self.get_delivery_status(uid)
         if delivery_status:
             serializer = DeliveryStatusSerializer(delivery_status)
             return Response(serializer.data)
         return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
     
-    def patch(self, request, order_uid, format=None):
-        delivery_status = self.get_delivery_status(order_uid)
+    def patch(self, request, uid, format=None):
+        delivery_status = self.get_delivery_status(uid)
         if delivery_status:
             serializer = DeliveryStatusSerializer(delivery_status, data=request.data, partial=True)
             if serializer.is_valid():
@@ -192,33 +193,28 @@ class DeliveryStatusCustomerAPIView(APIView):
 class FeedbackAPIView(APIView):
     permission_classes = [IsCustomer]
 
-    def post(self, request, format=None):
-        # Get the order UID from the request data
-        order_uid = request.data.get('order_uid')
-        
+    def post(self, request, uid, format=None):
         # Retrieve the order based on the provided UID
-        try:
-            order = Order.objects.get(uid=order_uid)
-        except Order.DoesNotExist:
-            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        order = get_object_or_404(Order, uid=uid)
         
         # Get the logged-in user
         user = request.user
         
         # Create feedback for the order with user and order details
-        serializer = FeedbackSerializer(data={'order': order.id, 'user': user.id, **request.data})
+        serializer = FeedbackSerializer(data={'Order': order.id, 'user': user.id, **request.data})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "Your feedback has been submitted"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 # Merchant functionality to fetch all the product feedbacks. Here exists problems. Need to fix those.
-class FeedbackList(APIView):
+class FeedbackDetail(APIView):
     permission_classes = [IsMerchant]
 
-    def get(self, request, format=None):
-        feedback = Feedback.objects.all()
+    def get(self, request, uid, format=None):
+        order = get_object_or_404(Order, uid=uid)
+        feedback = Feedback.objects.filter(Order=order)
         serializer = FeedbackSerializer(feedback, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

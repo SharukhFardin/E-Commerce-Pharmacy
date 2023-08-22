@@ -12,12 +12,16 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    order = OrderSerializer()
     class Meta:
         model = OrderItem
-        fields = '__all__'
+        fields = ('uid', 'quantity', 'order', 'product')
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
+
+
     class Meta:
         model = Feedback
         fields = '__all__'
@@ -42,6 +46,8 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class DeliveryStatusSerializer(serializers.ModelSerializer):
+    order = OrderSerializer()
+
     class Meta:
         model = DeliveryStatus
         fields = ('uid', 'order', 'status', 'updated_at')
