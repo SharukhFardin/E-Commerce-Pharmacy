@@ -1,0 +1,53 @@
+E-commerce Pharmacy Website - Intern Project Documentation
+
+Objective: 
+
+The objective of this intern project is to build an E-commerce website for a pharmacy shop that enables them to sell medicines to customers.
+The website should allow pharmacy owners to manage their inventory, add custom products, and request to add products to the main product database. 
+It should also have role-based access control for shop personnel, a cart system for customers to purchase multiple products, and a delivery management system for tracking orders.
+
+ 
+
+Project Requirements:
+
+Pharmacy Product Management:
+-> Load a vast database of medicines and allow pharmacies to inherit products into their inventory.
+-> Pharmacy shop owners/admin/staff can add custom products if not found in the database.
+-> Shop owners can request superusers to add their custom products to the main product database.
+
+Inventory Management:
+-> Each shop can manage its product inventory and track quantities available.
+-> Customers can only purchase products that are in stock.
+
+Role-Based Access Control:
+-> Implement four roles: Owner, Admin, Manager, and Staff, with varying levels of access and power.
+-> Shop owners and admins can create assistants with roles like manager or staff.
+-> Lower-level roles cannot create or edit higher-level roles' information.
+-> Admin cannot create an owner.
+
+Customer Cart System:
+-> Allow customers to add multiple products to their cart.
+-> Display the current product price in the cart.
+
+Order Management:
+-> Customers can place orders, and after purchase, the product price cannot be updated.
+-> The delivery address cannot be edited.
+-> Order fails if a product is out of stock, and the customer is informed of the stocked-out product(s).
+
+Delivery Management:
+-> Implement a delivery status tracking system.
+-> Customers can track their product delivery status.
+-> All roles of the shop can update the delivery status.
+-> Once a status is marked as "Done," staff and managers cannot undo it.
+-> Only Admin or Owner can undo a completed delivery status to set it to another status.
+
+Performance and Optimization:
+-> Use pagination to manage large datasets efficiently.
+-> Ensure queries do not exceed 350ms response time.
+-> Utilize Django-silk or Django-debug-tool to monitor and optimize queries.
+-> Implement annotate/eager loading to minimize the number of queries.
+
+Authorization with simple-jwt:
+-> Implement JWT-based authorization for secure API endpoints.
+-> Use djangorestframework-simplejwt package for handling JWT authentication.
+-> Use Custom Authorization for role-based authentication.
